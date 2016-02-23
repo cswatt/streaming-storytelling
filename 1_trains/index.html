@@ -1,0 +1,20 @@
+<input type="button" id="main-button" value="start"/>
+<ul id="list1">
+</ul>
+<script>
+var button = document.getElementById("main-button");
+var list = document.getElementById('list1');
+button.onclick = function(){
+	var ws = new WebSocket('ws://localhost:8080/');
+	ws.onopen = function(){
+		console.log("socket open");
+	};
+	ws.onmessage = function(event){
+		console.log(event.data);
+		var entry = document.createElement('li');
+		entry.appendChild(document.createTextNode(event.data));
+		list1.appendChild(entry);
+	};
+};
+</script>
+

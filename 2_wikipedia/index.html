@@ -1,0 +1,50 @@
+<input type="button" id="start-button" value="start"/>
+<input type="button" id="stop-button" value="stop"/>
+<br/>
+<span id="headline" style="visibility:hidden;">
+The current rate of edits is 
+<span id="rate"></span> per second.
+</span>
+<br/>
+<b>Recently edited articles on en.wikipedia.org</b>:
+<ul id="list1">
+</ul>
+<script>
+var start_button = document.getElementById("start-button");
+var stop_button = document.getElementById("stop-button");
+var list = document.getElementById('list1');
+var ws;
+var max_list_length = 20;
+var counter = 0;
+start_button.onclick = function(){
+	ws = new WebSocket('ws://localhost:8080/');
+	ws.onopen = function(){
+		console.log("socket open");
+	};
+	ws.onmessage = function(event){
+		var newmessage = JSON.parse(event.data);
+		if (newmessage.type == 'update'){
+			counter = counter + 1;
+			if (counter > max_list_length){
+				list1.removeChild(list1.childNodes[0]);
+			}
+			var entry = document.createElement('li');
+			entry.appendChild(document.createTextNode(newmessage.title));
+			list1.appendChild(entry)
+		} else if (newmessage.type == 'rate'){
+			document.querySelector("#headline").style.visibility = "visible";
+			document.getElementById("rate").innerHTML = newmessage.rate;
+			if (newmessage.rate > 2){
+				document.querySelector("#headline").style.color = "red";
+			} else {
+				document.querySelector("#headline").style.color = "black";
+			}
+		}
+		
+	};
+};
+stop_button.onclick = function(){
+	ws.close();
+};
+</script>
+
